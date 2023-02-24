@@ -16,28 +16,44 @@
         Seeking a house?
       </v-card-subtitle>
       <v-card-text>
-        <perfect-scrollbar class="perfect-scrollbar">
-        <div v-for="message in messages">
-          <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'">
-            <div class="message-infos">
-              <div class="message-sender">
-                {{ message.sender }}
+        <div>
+          <perfect-scrollbar class="perfect-scrollbar">
+          <div v-for="message in messages">
+            <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'">
+              <div class="message-infos">
+                <div class="message-sender">
+                  {{ message.sender }}
+                </div>
+                <div class="message-date">
+                  {{ message.date }}
+                </div>
               </div>
-              <div class="message-date">
-                {{ message.date }}
+              <div class="message-content">
+                {{ message.content }}
               </div>
-            </div>
-            <div class="message-content">
-              {{ message.content }}
-            </div>
-            <div class="message-answers">
-              <button v-on:click="submitAnswer(answer)" class="message-answer" v-for="answer in message.answers">
-              {{ answer.title }}
-              </button>
+              <div class="message-answers">
+                <button v-on:click="submitAnswer(answer)" class="message-answer" v-for="answer in message.answers">
+                {{ answer.title }}
+                </button>
+              </div>
             </div>
           </div>
+          </perfect-scrollbar>
         </div>
-        </perfect-scrollbar>
+        <div>
+          <v-form validate-on="submit" @submit.prevent="sendMessage">
+            <v-text-field
+              label="Write your message here"
+              hide-details="auto"
+              v-model="messageText">
+              <template v-slot:append>
+                <v-btn type="submit">
+                  <svg-icon type="mdi" :path="pathSendIcon"></svg-icon>
+                </v-btn>
+              </template>
+            </v-text-field>
+          </v-form>
+        </div>
       </v-card-text>
     </v-card>
   </div>

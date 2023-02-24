@@ -1,7 +1,7 @@
+import { isProxy, toRaw } from 'vue';
 import questionsJson from '../../questions/sorting_hat.json';
-
 import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiWindowClose } from '@mdi/js'
+import { mdiWindowClose, mdiSend } from '@mdi/js'
 
 export default {
   name: 'chatbox',
@@ -11,13 +11,18 @@ export default {
   props: [],
   data () {
     return {
+      messageText: null,
+      username: 'You',
       pathCloseIcon: mdiWindowClose,
+      pathSendIcon: mdiSend,
       display: true,
+      quizStarted: false,
+      quizEnded: false,
       messages: [
         {
           sender: 'Bot',
           date: '07:02pm',
-          content: 'Hi! I am the Sorting Hat. I will show you which house you will be in.'
+          content: 'Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)'
         },
       ],
       questions: questionsJson,
@@ -29,11 +34,22 @@ export default {
         answers: [
           {
             title: 'Yes',
-            action: (title) => this.sendAnswerWithCallback(title, this.startQuiz),
+            action: (title) => this.sendAnswerWithCallback(title, true, this.startQuiz),
           },
           {
             title: 'No',
-            action: (title) => this.sendAnswerWithCallback(title, this.askAgain),
+            action: (title) => this.sendAnswerWithCallback(title, true, this.askAgain),
+          }
+        ]
+      },
+      messageRestart: {
+        sender: 'Bot',
+        date: '07:16pm',
+        content: 'Not satisfied? You can still restart the quiz.',
+        answers: [
+          {
+            title: 'Restart',
+            action: (title) => this.sendAnswerWithCallback(title, true, this.restartQuiz),
           }
         ]
       },
@@ -50,23 +66,27 @@ export default {
 
   },
   mounted () {
-    this.messages.push(this.messageStart);
+    // this.messages.push(this.messageStart);
   },
   methods: {
-    sendAnswerWithCallback(title, callback) {
+    sendAnswerWithCallback(title, eraseAnswers, callback) {
       const lastMessage = this.messages[this.messages.length - 1];
-      if (lastMessage.goal !== 'startQuiz') {
+      if (eraseAnswers) {
         lastMessage.answers = [];
       }
       const message = {
-        sender: 'User',
+        sender: this.username,
         date: '07:09pm',
         content: title,
       }
       this.messages.push(message);
-      callback();
+      if (callback) {
+        callback();
+      }
     },
     startQuiz() {
+      this.quizStarted = true;
+      this.quizEnded = false;
       const message = {
         sender: 'Bot',
         date: '07:10pm',
@@ -82,19 +102,23 @@ export default {
         content: 'Why are you here then? :(',
       }
       this.messages.push(message);
-      this.messages.push(this.messageStart);
+      const messageStart = { ...this.messageStart };
+      this.messages.push(messageStart);
     },
     sendQuestion() {
-      if (this.questionIndex !== this.questions.length) {
-        const question = this.questions[this.questionIndex];
-        const message = {
-          sender: 'Bot',
-          date: '07:11pm',
-          content: question.title,
-          answers: question.answers,
-        }
-        this.messages.push(message);
+      const question = this.questions[this.questionIndex];
+      const message = {
+        sender: 'Bot',
+        date: '07:11pm',
+        content: question.title,
+        answers: question.answers,
+      }
+      this.messages.push(message);
+    },
+    nextQuestion() {
+      if (this.questionIndex !== this.questions.length - 1) {
         this.questionIndex++;
+        this.sendQuestion();
       } else {
         this.chooseHouse();
       }
@@ -107,10 +131,11 @@ export default {
         this.scores.r += answer.scores.r,
         this.scores.h += answer.scores.h,
         this.scores.s += answer.scores.s,
-        this.sendAnswerWithCallback(answer.title, this.sendQuestion);
+        this.sendAnswerWithCallback(answer.title, true, this.nextQuestion);
       }
     },
     chooseHouse() {
+      this.quizEnded = true;
       let maxScore = {
         value: 0
       };
@@ -146,25 +171,11 @@ export default {
         content: `${houseName}! I have chosen wisely!`,
       }
       this.messages.push(message);
-      const message2 = {
-        sender: 'Bot',
-        date: '07:16pm',
-        content: `Not satisfied? You can still restart the quiz.`,
-        answers: [
-          {
-            title: 'Restart',
-            action: (title) => this.sendAnswerWithCallback(title, this.restartQuiz),
-          },
-          {
-            title: 'Close',
-            action: () => this.display = false,
-          }
-        ]
-      }
-      this.messages.push(message2);
+      const messageRestart = { ...this.messageRestart };
+      this.messages.push(messageRestart);
     },
     restartQuiz() {
-      console.log(questionsJson);
+      this.quizStarted = false;
       this.questionIndex = 0;
       this.startQuiz();
     },
@@ -173,6 +184,72 @@ export default {
     },
     openChatbox() {
       this.display = true;
+    },
+    eraseMessageText() {
+      this.messageText = '';
+    },
+    sendMessage() {
+      if (!this.quizStarted && this.questionIndex === 0) {
+        if (this.username === 'You') {
+          this.sendAnswerWithCallback(this.messageText, true);
+          this.sendName();
+        } else {
+          this.sendAnswerWithCallback(this.messageText, true);
+          if (this.messageText.toLowerCase() === 'yes') {
+            this.startQuiz();
+          } else if (this.messageText.toLowerCase() === 'no') {
+            this.askAgain();
+          } else {
+            const message = {
+              sender: 'Bot',
+              date: '07:24pm',
+              content: `Sorry ${this.username}, I did not understand your choice.`,
+            }
+            this.messages.push(message);
+            const messageStart = { ...this.messageStart };
+            this.messages.push(messageStart);
+          }
+        }
+      } else if (!this.quizEnded) {
+        if (isProxy(this.questions)){
+          const questions = toRaw(this.questions)
+          const question = questions[this.questionIndex];
+          const { answers } = question;
+          const answerFound = answers.find(e => this.messageText.toLowerCase().includes(e.title.toLowerCase()));
+          if (answerFound) {
+            this.submitAnswer(answerFound);
+          } else {
+            this.sendAnswerWithCallback(this.messageText, false);
+            const message = {
+              sender: 'Bot',
+              date: '07:24pm',
+              content: `Sorry ${this.username}, I did not understand your choice.`,
+            }
+            this.messages.push(message);
+            this.sendQuestion();
+          }
+        }
+      } else {
+        this.sendAnswerWithCallback(this.messageText, true);
+        if (this.messageText.toLowerCase() === 'restart') {
+          this.restartQuiz();
+        } else {
+          const message = {
+            sender: 'Bot',
+            date: '07:24pm',
+            content: `Sorry ${this.username}, I did not understand your choice.`,
+          }
+          this.messages.push(message);
+          const messageRestart = { ...this.messageRestart };
+          this.messages.push(messageRestart);
+        }
+      }
+      this.eraseMessageText();
+    },
+    sendName() {
+      this.username = this.messageText;
+      const messageStart = { ...this.messageStart };
+      this.messages.push(messageStart);
     }
   }
 }
