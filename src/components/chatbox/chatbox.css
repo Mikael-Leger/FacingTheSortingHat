@@ -83,8 +83,15 @@
 
 .message-answers {
   margin-top: 5px;
+}
+
+.message-answers.message-short {
   display: flex;
   justify-content: space-evenly;
+}
+
+.message-answers.message-long .message-answer:not(:last-child) {
+  margin-bottom: 8px;
 }
 
 .message-answer {

@@ -30,9 +30,9 @@
               <div class="message-content">
                 {{ message.content }}
               </div>
-              <div class="message-answers">
+              <div class="message-answers" :class="message.answersAreLong ? 'message-long' : 'message-short'">
                 <button v-on:click="submitAnswer(answer)" class="message-answer" v-for="answer in message.answers">
-                {{ answer.title }}
+                  {{ answer.title }}
                 </button>
               </div>
             </div>

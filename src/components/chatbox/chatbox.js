@@ -66,7 +66,7 @@ export default {
   computed: {
   },
   mounted () {
-    
+    this.startQuiz();
   },
   methods: {
     async sendAnswerWithCallback(title, eraseAnswers, callback) {
@@ -106,14 +106,18 @@ export default {
       await this.pushMessage(messageStart);
     },
     async sendQuestion() {
-      const question = this.questions[this.questionIndex];
-      const message = {
-        sender: 'Bot',
-        date: '07:11pm',
-        content: question.title,
-        answers: question.answers,
+      if (isProxy(this.questions)) {
+        const questions = toRaw(this.questions)
+        const question = questions[this.questionIndex];
+        const message = {
+          sender: 'Bot',
+          date: '07:11pm',
+          content: question.title,
+          answers: question.answers,
+          answersAreLong: question.answers[0].title.length >= 20
+        }
+        await this.pushMessage(message);
       }
-      await this.pushMessage(message);
     },
     nextQuestion() {
       if (this.questionIndex !== this.questions.length - 1) {
@@ -257,7 +261,7 @@ export default {
     async pushMessage(message) {
       if (message.sender === 'Bot') {
         // Use animation to wait such as the bot is thinking
-        await new Promise(r => setTimeout(r, 1200));
+        // await new Promise(r => setTimeout(r, 1200));
       }
       // Use animation to fade message in
       const lastMessage = this.messages[this.messages.length - 1];
