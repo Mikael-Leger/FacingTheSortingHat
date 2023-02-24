@@ -6,6 +6,8 @@
 
 // Components
 import App from './App.vue'
+import PerfectScrollbar from 'vue3-perfect-scrollbar'
+import 'vue3-perfect-scrollbar/dist/vue3-perfect-scrollbar.css'
 
 // Composables
 import { createApp } from 'vue'
@@ -21,4 +23,4 @@ const vuetify = createVuetify({
   directives,
 })
 
-createApp(App).use(vuetify).mount('#app')
+createApp(App).use(vuetify).use(PerfectScrollbar).mount('#app')

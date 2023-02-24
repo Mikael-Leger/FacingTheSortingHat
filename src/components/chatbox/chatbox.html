@@ -1,5 +1,50 @@
 
-<section class="chatbox">
-  <h1>chatbox Component</h1>
+<section class="chatbox" :class="display === false ? 'closed': 'open'">
+  <div class="box">
+    <v-card
+      class="box-card"
+      variant="tonal">
+      <v-card-title>
+        <div>
+          FTSH Bot
+        </div>
+        <button v-on:click="closeChatbox()">
+          <svg-icon type="mdi" :path="pathCloseIcon"></svg-icon>
+        </button>
+      </v-card-title>
+      <v-card-subtitle>
+        Seeking a house?
+      </v-card-subtitle>
+      <v-card-text>
+        <perfect-scrollbar class="perfect-scrollbar">
+        <div v-for="message in messages">
+          <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'">
+            <div class="message-infos">
+              <div class="message-sender">
+                {{ message.sender }}
+              </div>
+              <div class="message-date">
+                {{ message.date }}
+              </div>
+            </div>
+            <div class="message-content">
+              {{ message.content }}
+            </div>
+            <div class="message-answers">
+              <button v-on:click="submitAnswer(answer)" class="message-answer" v-for="answer in message.answers">
+              {{ answer.title }}
+              </button>
+            </div>
+          </div>
+        </div>
+        </perfect-scrollbar>
+      </v-card-text>
+    </v-card>
+  </div>
+  <div class="box-closed">
+    <button v-on:click="openChatbox()">
+      FTSH Bot
+    </button>
+  </div>
 </section>
 
