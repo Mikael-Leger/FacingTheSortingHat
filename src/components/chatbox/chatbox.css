@@ -134,3 +134,29 @@
 .button-delete-box {
   left: 0;
 }
+
+.message-fade-enter-from:has(.message-bot) {
+  width: 30%;
+  font-size: 0em;
+  opacity: 0;
+}
+.message-fade-enter-to:has(.message-bot) {
+  width: 100%;
+  font-size: 1em;
+  opacity: 1;
+}
+.message-fade-enter-from:has(.message-user) {
+  margin-left: 70%;
+  width: 30%;
+  font-size: 0em;
+  opacity: 0;
+}
+.message-fade-enter-to:has(.message-user) {
+  margin-left: 0;
+  width: 100%;
+  font-size: 1em;
+  opacity: 1;
+}
+.message-fade-enter-active {
+  transition: all 1.5s ease;
+}

@@ -1,4 +1,4 @@
-import { isProxy, toRaw } from 'vue';
+import { isProxy, toRaw, ref } from 'vue';
 import questionsJson from '../../questions/sorting_hat.json';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiWindowRestore, mdiSend } from '@mdi/js'
@@ -7,6 +7,19 @@ export default {
   name: 'chatbox',
   components: {
     SvgIcon
+  },
+  setup() {
+    const showP = ref(false);
+    const messages = ref([
+      {
+        id: 0,
+        sender: 'Bot',
+        date: '07:02pm',
+        content: 'Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)'
+      },
+    ]);
+    
+    return { showP, messages };
   },
   props: [],
   data () {
@@ -18,14 +31,6 @@ export default {
       display: true,
       quizStarted: false,
       quizEnded: false,
-      messages: [
-        {
-          id: 0,
-          sender: 'Bot',
-          date: '07:02pm',
-          content: 'Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)'
-        },
-      ],
       questions: questionsJson,
       messageStart: {
         sender: 'Bot',
@@ -62,8 +67,6 @@ export default {
       },
       questionIndex: 0
     }
-  },
-  computed: {
   },
   mounted () {
     this.startQuiz();
@@ -261,20 +264,21 @@ export default {
     async pushMessage(message) {
       if (message.sender === 'Bot') {
         // Use animation to wait such as the bot is thinking
-        // await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1200));
       }
-      // Use animation to fade message in
       const lastMessage = this.messages[this.messages.length - 1];
       const messageWithId = { ...message };
       messageWithId.id = lastMessage.id + 1;
       await this.messages.push(messageWithId);
       this.scrollToBottom();
     },
-    scrollToBottom() {
+    async scrollToBottom() {
       if (isProxy(this.$refs)) {
         const refs = toRaw(this.$refs)
+        await new Promise(r => setTimeout(r, 1500));
+        console.log("scrolling");
         refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
-        // this.$refs["bottom"].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
+        // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
       }
     },
   }

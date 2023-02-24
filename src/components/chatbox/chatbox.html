@@ -17,26 +17,35 @@
       <v-card-text class="box-text">
         <div class="box-chat">
           <perfect-scrollbar class="perfect-scrollbar">
-          <div v-for="message in messages">
-            <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'" :ref="'bottom' + message.id">
-              <div class="message-infos">
-                <div class="message-sender">
-                  {{ message.sender }}
+            <TransitionGroup name="message-fade" class="transition-message-fade">
+              <div v-for="message in messages" :key="message">
+                <div
+                  class="message"
+                  :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'"
+                  :ref="'bottom' + message.id">
+                  <div class="message-infos">
+                    <div class="message-sender">
+                      {{ message.sender }}
+                    </div>
+                    <div class="message-date">
+                      {{ message.date }}
+                    </div>
+                  </div>
+                  <div class="message-content">
+                    {{ message.content }}
+                  </div>
+                  <div class="message-answers"
+                    :class="message.answersAreLong ? 'message-long' : 'message-short'">
+                    <button
+                      v-on:click="submitAnswer(answer)"
+                      class="message-answer"
+                      v-for="answer in message.answers">
+                      {{ answer.title }}
+                    </button>
+                  </div>
                 </div>
-                <div class="message-date">
-                  {{ message.date }}
-                </div>
               </div>
-              <div class="message-content">
-                {{ message.content }}
-              </div>
-              <div class="message-answers" :class="message.answersAreLong ? 'message-long' : 'message-short'">
-                <button v-on:click="submitAnswer(answer)" class="message-answer" v-for="answer in message.answers">
-                  {{ answer.title }}
-                </button>
-              </div>
-            </div>
-          </div>
+            </TransitionGroup>
           </perfect-scrollbar>
         </div>
         <div class="message-text-bar">
