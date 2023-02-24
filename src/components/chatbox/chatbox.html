@@ -5,18 +5,17 @@
       class="box-card"
       variant="tonal">
       <v-card-title class="box-title">
-        <div>
-          FTSH Bot
-        </div>
-        <button v-on:click="closeChatbox()" class="button-close-box">
-          <svg-icon type="mdi" :path="pathCloseIcon"></svg-icon>
+        <button v-on:click="closeOrOpenChatbox()" class="button-close-box">
+          <div>
+            FTSH Bot
+          </div>
+          <button v-on:click="deleteChatbox()" class="button-delete-box">
+            <svg-icon type="mdi" :path="pathCloseIcon"></svg-icon>
+          </button>
         </button>
       </v-card-title>
-      <v-card-subtitle class="box-subtitle">
-        Seeking a house?
-      </v-card-subtitle>
-      <v-card-text>
-        <div>
+      <v-card-text class="box-text">
+        <div class="box-chat">
           <perfect-scrollbar class="perfect-scrollbar">
           <div v-for="message in messages">
             <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'" :ref="'bottom' + message.id">
@@ -40,7 +39,7 @@
           </div>
           </perfect-scrollbar>
         </div>
-        <div>
+        <div class="message-text-bar">
           <v-form validate-on="submit" @submit.prevent="sendMessage">
             <v-text-field
               label="Write your message here"
@@ -56,11 +55,6 @@
         </div>
       </v-card-text>
     </v-card>
-  </div>
-  <div class="box-closed">
-    <button v-on:click="openChatbox()">
-      FTSH Bot
-    </button>
   </div>
 </section>
 

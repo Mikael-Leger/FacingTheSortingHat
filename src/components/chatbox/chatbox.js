@@ -1,7 +1,7 @@
 import { isProxy, toRaw } from 'vue';
 import questionsJson from '../../questions/sorting_hat.json';
 import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiWindowClose, mdiSend } from '@mdi/js'
+import { mdiWindowRestore, mdiSend } from '@mdi/js'
 
 export default {
   name: 'chatbox',
@@ -13,7 +13,7 @@ export default {
     return {
       messageText: null,
       username: 'You',
-      pathCloseIcon: mdiWindowClose,
+      pathCloseIcon: mdiWindowRestore,
       pathSendIcon: mdiSend,
       display: true,
       quizStarted: false,
@@ -179,11 +179,8 @@ export default {
       this.questionIndex = 0;
       this.startQuiz();
     },
-    closeChatbox() {
-      this.display = false;
-    },
-    openChatbox() {
-      this.display = true;
+    closeOrOpenChatbox() {
+      this.display = !this.display;
     },
     eraseMessageText() {
       this.messageText = '';

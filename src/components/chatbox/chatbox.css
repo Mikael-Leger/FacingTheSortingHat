@@ -7,8 +7,8 @@
 }
 
 .box {
-  width: 400px;
-  height: 400px;
+  width: 600px;
+  height: 600px;
   border-bottom: 0;
 }
 
@@ -19,15 +19,20 @@
 }
 
 .box .box-title {
-  display: flex;
-  justify-content: space-between;
+  border-bottom: 1px solid black;
+  padding-top: 12px;
   padding-bottom: 0;
+  background-color: rgb(161, 105, 224);
 }
 
-.box .box-subtitle {
-  font-size: 0.8em;
-  padding-bottom: 2px;
-  border-bottom: 1px solid black;
+.button-close-box {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.box .box-text {
+  padding-top: 0;
 }
 
 .message {
@@ -35,17 +40,18 @@
   padding: 8px;
   margin: 10px 0;
   border-radius: 4px;
+  box-shadow: rgb(0 0 0 / 15%) 5px 4px 2.6px;
 }
 
 .message-bot {
-  margin-left: 10px;
+  margin-left: 20px;
   margin-right: 50px;
-  background-color: rgb(188, 135, 238);
+  background-color: rgb(161, 105, 224);
 }
 
 .message-user {
   text-align: right;
-  margin-right: 10px;
+  margin-right: 20px;
   margin-left: 50px;
   background-color: rgb(130, 204, 223);
 }
@@ -93,14 +99,23 @@
 }
 
 .perfect-scrollbar {
-  height: 250px;
+  height: 480px;
+}
+
+.box-chat {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+.message-text-bar {
+  padding-top: 10px;
+  border-top: 1px solid black;
 }
 
 .closed .box {
-  display: none;
+  height: 60px;
 }
 
-.open .box-closed {
+.closed .box .box-text {
   display: none;
 }
 
@@ -109,6 +124,6 @@
   bottom: 12px;
 }
 
-.button-close-box {
+.button-delete-box {
   left: 0;
 }
