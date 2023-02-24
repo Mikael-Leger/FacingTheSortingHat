@@ -12,8 +12,6 @@
     "@mdi/js": "^7.1.96",
     "roboto-fontface": "*",
     "vue": "^3.2.38",
-    "vue-chat-scroll": "^1.4.0",
-    "vue-virtual-scroll-list": "^2.3.4",
     "vue3-perfect-scrollbar": "^1.6.1",
     "vuetify": "^3.0.0",
     "webfontloader": "^1.0.0"
