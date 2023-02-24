@@ -4,22 +4,22 @@
     <v-card
       class="box-card"
       variant="tonal">
-      <v-card-title>
+      <v-card-title class="box-title">
         <div>
           FTSH Bot
         </div>
-        <button v-on:click="closeChatbox()">
+        <button v-on:click="closeChatbox()" class="button-close-box">
           <svg-icon type="mdi" :path="pathCloseIcon"></svg-icon>
         </button>
       </v-card-title>
-      <v-card-subtitle>
+      <v-card-subtitle class="box-subtitle">
         Seeking a house?
       </v-card-subtitle>
       <v-card-text>
         <div>
           <perfect-scrollbar class="perfect-scrollbar">
           <div v-for="message in messages">
-            <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'">
+            <div class="message" :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'" :ref="'bottom' + message.id">
               <div class="message-infos">
                 <div class="message-sender">
                   {{ message.sender }}
@@ -47,7 +47,7 @@
               hide-details="auto"
               v-model="messageText">
               <template v-slot:append>
-                <v-btn type="submit">
+                <v-btn type="submit" class="button-send-message">
                   <svg-icon type="mdi" :path="pathSendIcon"></svg-icon>
                 </v-btn>
               </template>

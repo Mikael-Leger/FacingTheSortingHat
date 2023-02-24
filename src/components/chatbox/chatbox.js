@@ -20,6 +20,7 @@ export default {
       quizEnded: false,
       messages: [
         {
+          id: 0,
           sender: 'Bot',
           date: '07:02pm',
           content: 'Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)'
@@ -63,13 +64,12 @@ export default {
     }
   },
   computed: {
-
   },
   mounted () {
-    // this.messages.push(this.messageStart);
+    
   },
   methods: {
-    sendAnswerWithCallback(title, eraseAnswers, callback) {
+    async sendAnswerWithCallback(title, eraseAnswers, callback) {
       const lastMessage = this.messages[this.messages.length - 1];
       if (eraseAnswers) {
         lastMessage.answers = [];
@@ -79,12 +79,12 @@ export default {
         date: '07:09pm',
         content: title,
       }
-      this.messages.push(message);
+      await this.pushMessage(message);
       if (callback) {
         callback();
       }
     },
-    startQuiz() {
+    async startQuiz() {
       this.quizStarted = true;
       this.quizEnded = false;
       const message = {
@@ -92,20 +92,20 @@ export default {
         date: '07:10pm',
         content: 'Quiz is starting!',
       }
-      this.messages.push(message);
+      await this.pushMessage(message);
       this.sendQuestion();
     },
-    askAgain() {
+    async askAgain() {
       const message = {
         sender: 'Bot',
         date: '07:10pm',
         content: 'Why are you here then? :(',
       }
-      this.messages.push(message);
+      await this.pushMessage(message);
       const messageStart = { ...this.messageStart };
-      this.messages.push(messageStart);
+      await this.pushMessage(messageStart);
     },
-    sendQuestion() {
+    async sendQuestion() {
       const question = this.questions[this.questionIndex];
       const message = {
         sender: 'Bot',
@@ -113,7 +113,7 @@ export default {
         content: question.title,
         answers: question.answers,
       }
-      this.messages.push(message);
+      await this.pushMessage(message);
     },
     nextQuestion() {
       if (this.questionIndex !== this.questions.length - 1) {
@@ -134,7 +134,7 @@ export default {
         this.sendAnswerWithCallback(answer.title, true, this.nextQuestion);
       }
     },
-    chooseHouse() {
+    async chooseHouse() {
       this.quizEnded = true;
       let maxScore = {
         value: 0
@@ -170,9 +170,9 @@ export default {
         date: '07:15pm',
         content: `${houseName}! I have chosen wisely!`,
       }
-      this.messages.push(message);
+      await this.pushMessage(message);
       const messageRestart = { ...this.messageRestart };
-      this.messages.push(messageRestart);
+      await this.pushMessage(messageRestart);
     },
     restartQuiz() {
       this.quizStarted = false;
@@ -188,7 +188,7 @@ export default {
     eraseMessageText() {
       this.messageText = '';
     },
-    sendMessage() {
+    async sendMessage() {
       if (!this.quizStarted && this.questionIndex === 0) {
         if (this.username === 'You') {
           this.sendAnswerWithCallback(this.messageText, true);
@@ -205,13 +205,13 @@ export default {
               date: '07:24pm',
               content: `Sorry ${this.username}, I did not understand your choice.`,
             }
-            this.messages.push(message);
+            await this.pushMessage(message);
             const messageStart = { ...this.messageStart };
-            this.messages.push(messageStart);
+            await this.pushMessage(messageStart);
           }
         }
       } else if (!this.quizEnded) {
-        if (isProxy(this.questions)){
+        if (isProxy(this.questions)) {
           const questions = toRaw(this.questions)
           const question = questions[this.questionIndex];
           const { answers } = question;
@@ -225,7 +225,7 @@ export default {
               date: '07:24pm',
               content: `Sorry ${this.username}, I did not understand your choice.`,
             }
-            this.messages.push(message);
+            await this.pushMessage(message);
             this.sendQuestion();
           }
         }
@@ -239,18 +239,43 @@ export default {
             date: '07:24pm',
             content: `Sorry ${this.username}, I did not understand your choice.`,
           }
-          this.messages.push(message);
+          await this.pushMessage(message);
           const messageRestart = { ...this.messageRestart };
-          this.messages.push(messageRestart);
+          await this.pushMessage(messageRestart);
         }
       }
       this.eraseMessageText();
     },
-    sendName() {
+    async sendName() {
       this.username = this.messageText;
+      const message = {
+        sender: 'Bot',
+        date: '07:35pm',
+        content: `Nice to meet you ${this.username}!`,
+      }
+      await this.pushMessage(message);
       const messageStart = { ...this.messageStart };
-      this.messages.push(messageStart);
-    }
+      await this.pushMessage(messageStart);
+    },
+    async pushMessage(message) {
+      if (message.sender === 'Bot') {
+        // Use animation to wait such as the bot is thinking
+        await new Promise(r => setTimeout(r, 1200));
+      }
+      // Use animation to fade message in
+      const lastMessage = this.messages[this.messages.length - 1];
+      const messageWithId = { ...message };
+      messageWithId.id = lastMessage.id + 1;
+      await this.messages.push(messageWithId);
+      this.scrollToBottom();
+    },
+    scrollToBottom() {
+      if (isProxy(this.$refs)) {
+        const refs = toRaw(this.$refs)
+        refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
+        // this.$refs["bottom"].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
+      }
+    },
   }
 }
 
