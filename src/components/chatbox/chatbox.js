@@ -11,14 +11,7 @@ export default {
   setup() {
     const showBox = ref(false);
     const showClosedBox = ref(true);
-    const messages = ref([
-      {
-        id: 0,
-        sender: 'Bot',
-        date: '07:02pm',
-        content: 'Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)'
-      },
-    ]);
+    const messages = ref([]);
     const messagesSaved = ref([]);
     
     return { showBox, showClosedBox, messages, messagesSaved };
@@ -71,6 +64,7 @@ export default {
     }
   },
   mounted () {
+    this.pushMessage('Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)', true);
     this.showBox = !this.showBox;
     this.showClosedBox = !this.showClosedBox;
     this.startQuiz();
@@ -81,12 +75,7 @@ export default {
       if (eraseAnswers) {
         lastMessage.answers = [];
       }
-      const message = {
-        sender: this.username,
-        date: '07:09pm',
-        content: title,
-      }
-      await this.pushMessage(message);
+      await this.pushMessage(title, false);
       if (callback) {
         callback();
       }
@@ -94,23 +83,13 @@ export default {
     async startQuiz() {
       this.quizStarted = true;
       this.quizEnded = false;
-      const message = {
-        sender: 'Bot',
-        date: '07:10pm',
-        content: 'Quiz is starting!',
-      }
-      await this.pushMessage(message);
+      await this.pushMessage('Quiz is starting!', true);
       this.sendQuestion();
     },
     async askAgain() {
-      const message = {
-        sender: 'Bot',
-        date: '07:10pm',
-        content: 'Why are you here then? :(',
-      }
-      await this.pushMessage(message);
+      await this.pushMessage('Why are you here then? :(', true);
       const messageStart = { ...this.messageStart };
-      await this.pushMessage(messageStart);
+      await this.pushMessage(messageStart.content, true);
     },
     async sendQuestion() {
       if (isProxy(this.questions)) {
@@ -123,7 +102,17 @@ export default {
           answers: question.answers,
           answersAreLong: question.answers[0].title.length >= 20
         }
-        await this.pushMessage(message);
+        const options = [
+          {
+            key: 'answers',
+            value: question.answers
+          },
+          {
+            key: 'answersAreLong',
+            value: question.answers[0].title.length >= 20
+          }
+        ]
+        await this.pushMessage(question.title, true, options);
       }
     },
     nextQuestion() {
@@ -176,14 +165,9 @@ export default {
         default:
           break;
       }
-      const message = {
-        sender: 'Bot',
-        date: '07:15pm',
-        content: `${houseName}! I have chosen wisely!`,
-      }
-      await this.pushMessage(message);
+      await this.pushMessage(`${houseName}! I have chosen wisely!`, true);
       const messageRestart = { ...this.messageRestart };
-      await this.pushMessage(messageRestart);
+      await this.pushMessage(messageRestart.content, true);
     },
     restartQuiz() {
       this.quizStarted = false;
@@ -218,14 +202,9 @@ export default {
           } else if (this.messageText.toLowerCase() === 'no') {
             this.askAgain();
           } else {
-            const message = {
-              sender: 'Bot',
-              date: '07:24pm',
-              content: `Sorry ${this.username}, I did not understand your choice.`,
-            }
-            await this.pushMessage(message);
+            await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
             const messageStart = { ...this.messageStart };
-            await this.pushMessage(messageStart);
+            await this.pushMessage(messageStart.content, true);
           }
         }
       } else if (!this.quizEnded) {
@@ -238,12 +217,7 @@ export default {
             this.submitAnswer(answerFound);
           } else {
             this.sendAnswerWithCallback(this.messageText, false);
-            const message = {
-              sender: 'Bot',
-              date: '07:24pm',
-              content: `Sorry ${this.username}, I did not understand your choice.`,
-            }
-            await this.pushMessage(message);
+            await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
             this.sendQuestion();
           }
         }
@@ -252,36 +226,35 @@ export default {
         if (this.messageText.toLowerCase() === 'restart') {
           this.restartQuiz();
         } else {
-          const message = {
-            sender: 'Bot',
-            date: '07:24pm',
-            content: `Sorry ${this.username}, I did not understand your choice.`,
-          }
-          await this.pushMessage(message);
+          await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
           const messageRestart = { ...this.messageRestart };
-          await this.pushMessage(messageRestart);
+          await this.pushMessage(messageRestart.content, true);
         }
       }
       this.eraseMessageText();
     },
     async sendName() {
       this.username = this.messageText;
-      const message = {
-        sender: 'Bot',
-        date: '07:35pm',
-        content: `Nice to meet you ${this.username}!`,
-      }
-      await this.pushMessage(message);
+      await this.pushMessage(`Nice to meet you ${this.username}!`, true);
       const messageStart = { ...this.messageStart };
-      await this.pushMessage(messageStart);
+      await this.pushMessage(messageStart.content, true);
     },
-    async pushMessage(message) {
-      if (message.sender === 'Bot') {
+    async pushMessage(content, bot, options = []) {
+      if (bot) {
         await new Promise(r => setTimeout(r, 1200));
       }
       const lastMessage = this.messages[this.messages.length - 1];
-      const messageWithId = { ...message };
-      messageWithId.id = lastMessage.id + 1;
+      const dateNow = new Date();
+      const dateFormatted = `${dateNow.getHours()}:${dateNow.getMinutes()}`;
+      const messageWithId = { 
+        id: (lastMessage) ? lastMessage.id + 1 : 0,
+        sender: bot ? 'Bot' : this.username,
+        content,
+        date: dateFormatted,
+      };
+      options.forEach(option => {
+        messageWithId[option.key] = option.value;
+      });
       await this.messages.push(messageWithId);
       this.scrollToBottom();
     },
