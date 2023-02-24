@@ -1,7 +1,7 @@
 import { isProxy, toRaw, ref } from 'vue';
 import questionsJson from '../../questions/sorting_hat.json';
 import SvgIcon from '@jamescoyle/vue-icon'
-import { mdiWindowRestore, mdiSend } from '@mdi/js'
+import { mdiWindowRestore, mdiWindowMinimize, mdiSend } from '@mdi/js'
 
 export default {
   name: 'chatbox',
@@ -9,7 +9,8 @@ export default {
     SvgIcon
   },
   setup() {
-    const showP = ref(false);
+    const showBox = ref(false);
+    const showClosedBox = ref(true);
     const messages = ref([
       {
         id: 0,
@@ -18,8 +19,9 @@ export default {
         content: 'Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)'
       },
     ]);
+    const messagesSaved = ref([]);
     
-    return { showP, messages };
+    return { showBox, showClosedBox, messages, messagesSaved };
   },
   props: [],
   data () {
@@ -27,8 +29,8 @@ export default {
       messageText: null,
       username: 'You',
       pathCloseIcon: mdiWindowRestore,
+      pathOpenIcon: mdiWindowMinimize,
       pathSendIcon: mdiSend,
-      display: true,
       quizStarted: false,
       quizEnded: false,
       questions: questionsJson,
@@ -69,6 +71,8 @@ export default {
     }
   },
   mounted () {
+    this.showBox = !this.showBox;
+    this.showClosedBox = !this.showClosedBox;
     this.startQuiz();
   },
   methods: {
@@ -186,8 +190,18 @@ export default {
       this.questionIndex = 0;
       this.startQuiz();
     },
-    closeOrOpenChatbox() {
-      this.display = !this.display;
+    async closeChatbox() {
+      this.messagesSaved = [ ...this.messages ];
+      await Promise.resolve(this.messages = []);
+      this.showBox = !this.showBox;
+      await new Promise(r => setTimeout(r, 1510));
+      this.showClosedBox = !this.showClosedBox;
+    },
+    async openChatbox() {
+      this.showClosedBox = !this.showClosedBox;
+      await Promise.resolve(this.showBox = !this.showBox);
+      this.messages = [ ...this.messagesSaved ];
+      this.messagesSaved = [];
     },
     eraseMessageText() {
       this.messageText = '';
@@ -263,7 +277,6 @@ export default {
     },
     async pushMessage(message) {
       if (message.sender === 'Bot') {
-        // Use animation to wait such as the bot is thinking
         await new Promise(r => setTimeout(r, 1200));
       }
       const lastMessage = this.messages[this.messages.length - 1];
@@ -275,9 +288,9 @@ export default {
     async scrollToBottom() {
       if (isProxy(this.$refs)) {
         const refs = toRaw(this.$refs)
-        await new Promise(r => setTimeout(r, 1500));
-        console.log("scrolling");
-        refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
+        await new Promise(r => setTimeout(r, 1810));
+        // Scrolling make top bar padding go crazy =)
+        // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
         // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
       }
     },

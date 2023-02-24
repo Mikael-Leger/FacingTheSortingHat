@@ -12,16 +12,20 @@
   border-bottom: 0;
 }
 
+.box-closed {
+  height: 55px;
+}
+
 .box-card {
   height: 100%;
-  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 50px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
   border-radius: 15px 15px 0 0;
 }
 
 .box .box-title {
   border-bottom: 1px solid black;
   padding-top: 12px;
-  padding-bottom: 0;
+  padding-bottom: 5px;
   background-color: rgb(161, 105, 224);
 }
 
@@ -118,14 +122,6 @@
   border-top: 1px solid black;
 }
 
-.closed .box {
-  height: 60px;
-}
-
-.closed .box .box-text {
-  display: none;
-}
-
 .button-send-message {
   height: 125%;
   bottom: 12px;
@@ -158,5 +154,44 @@
   opacity: 1;
 }
 .message-fade-enter-active {
+  transition: all 1.5s ease;
+}
+
+.message-fade-enter-from {
+  opacity: 0;
+}
+.message-fade-enter-to {
+  opacity: 1;
+}
+.message-fade-enter-active {
+  transition: all 1.5s ease;
+}
+.message-fade-leave-from {
+  opacity: 1;
+}
+.message-fade-leave-to {
+  opacity: 0;
+}
+.message-fade-leave-active {
+  transition: all 1.5s ease;
+}
+
+.chat-box-enter-from {
+  height: 55px;
+}
+.chat-box-enter-to {
+  height: 600px;
+}
+.chat-box-enter-active {
+  transition: all 1.5s ease;
+}
+
+.chat-box-leave-from {
+  height: 600px;
+}
+.chat-box-leave-to {
+  height: 55px;
+}
+.chat-box-leave-active {
   transition: all 1.5s ease;
 }
