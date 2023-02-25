@@ -275,14 +275,20 @@ export default {
         messageWithId[option.key] = option.value;
       });
       await this.messages.push(messageWithId);
-      this.scrollToBottom();
+      this.scrollToBottom(bot);
     },
-    async scrollToBottom() {
+    async scrollToBottom(bot) {
       if (isProxy(this.$refs)) {
         const refs = toRaw(this.$refs)
-        await new Promise(r => setTimeout(r, 1510));
         const ref = refs[`bottom${Object.keys(refs).length - 1}`][0];
+        console.log(`scroll to bottom${Object.keys(refs).length - 1}`);
+        console.log(refs);
+        await new Promise(r => setTimeout(r, 10));
         ref.scrollIntoView(true);
+        if (bot) {
+          await new Promise(r => setTimeout(r, 1000));
+          ref.scrollIntoView(true);
+        }
         // ref.scrollIntoView({ behavior: "smooth" }); // Smooth not working because of weird perfect scroll element
       }
     },
