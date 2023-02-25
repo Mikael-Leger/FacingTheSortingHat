@@ -1,20 +1,26 @@
 import { isProxy, toRaw, ref } from 'vue';
-import questionsJson from '../../questions/sorting_hat.json';
+import questionsJson from '../../questions/sorting_hat_full.json';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiWindowRestore, mdiWindowMinimize, mdiSend } from '@mdi/js'
+import { MqResponsive } from "vue3-mq";
 
 export default {
   name: 'chatbox',
   components: {
-    SvgIcon
+    SvgIcon,
+    MqResponsive
   },
   setup() {
     const showBox = ref(false);
     const showClosedBox = ref(true);
     const messages = ref([]);
     const messagesSaved = ref([]);
-    
-    return { showBox, showClosedBox, messages, messagesSaved };
+    const window = ref({
+      width: 0,
+      height: 0
+    });
+
+    return { showBox, showClosedBox, messages, messagesSaved, window };
   },
   props: [],
   data () {
@@ -26,12 +32,10 @@ export default {
       pathSendIcon: mdiSend,
       quizStarted: false,
       quizEnded: false,
-      questions: questionsJson,
+      questions: questionsJson.sort((a, b) => 0.5 - Math.random()),
+      progression: 0,
       messageStart: {
-        sender: 'Bot',
-        date: '07:07pm',
         content: 'Are you ready to start?',
-        goal: 'startQuiz',
         answers: [
           {
             title: 'Yes',
@@ -44,8 +48,6 @@ export default {
         ]
       },
       messageRestart: {
-        sender: 'Bot',
-        date: '07:16pm',
         content: 'Not satisfied? You can still restart the quiz.',
         answers: [
           {
@@ -64,10 +66,11 @@ export default {
     }
   },
   mounted () {
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize();
     this.pushMessage('Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)', true);
     this.showBox = !this.showBox;
     this.showClosedBox = !this.showClosedBox;
-    this.startQuiz();
   },
   methods: {
     async sendAnswerWithCallback(title, eraseAnswers, callback) {
@@ -88,20 +91,12 @@ export default {
     },
     async askAgain() {
       await this.pushMessage('Why are you here then? :(', true);
-      const messageStart = { ...this.messageStart };
-      await this.pushMessage(messageStart.content, true);
+      await this.sendStartMessage();
     },
     async sendQuestion() {
       if (isProxy(this.questions)) {
         const questions = toRaw(this.questions)
         const question = questions[this.questionIndex];
-        const message = {
-          sender: 'Bot',
-          date: '07:11pm',
-          content: question.title,
-          answers: question.answers,
-          answersAreLong: question.answers[0].title.length >= 20
-        }
         const options = [
           {
             key: 'answers',
@@ -109,7 +104,7 @@ export default {
           },
           {
             key: 'answersAreLong',
-            value: question.answers[0].title.length >= 20
+            value: (question.answers[0].title.length >= 20) || (question.answers.length >= 5)
           }
         ]
         await this.pushMessage(question.title, true, options);
@@ -118,6 +113,7 @@ export default {
     nextQuestion() {
       if (this.questionIndex !== this.questions.length - 1) {
         this.questionIndex++;
+        this.progression = Math.round((this.questionIndex * 100) / this.questions.length);
         this.sendQuestion();
       } else {
         this.chooseHouse();
@@ -166,8 +162,7 @@ export default {
           break;
       }
       await this.pushMessage(`${houseName}! I have chosen wisely!`, true);
-      const messageRestart = { ...this.messageRestart };
-      await this.pushMessage(messageRestart.content, true);
+      await this.sendRestartMessage();
     },
     restartQuiz() {
       this.quizStarted = false;
@@ -190,6 +185,26 @@ export default {
     eraseMessageText() {
       this.messageText = '';
     },
+    async sendStartMessage() {
+      const messageStart = { ...this.messageStart };
+      const options = [
+        {
+          key: 'answers',
+          value: messageStart.answers
+        }
+      ]
+      await this.pushMessage(messageStart.content, true, options);
+    },
+    async sendRestartMessage() {
+      const messageRestart = { ...this.messageRestart };
+      const options = [
+        {
+          key: 'answers',
+          value: messageRestart.answers
+        }
+      ]
+      await this.pushMessage(messageRestart.content, true, options);
+    },
     async sendMessage() {
       if (!this.quizStarted && this.questionIndex === 0) {
         if (this.username === 'You') {
@@ -203,8 +218,7 @@ export default {
             this.askAgain();
           } else {
             await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
-            const messageStart = { ...this.messageStart };
-            await this.pushMessage(messageStart.content, true);
+            await this.sendStartMessage();
           }
         }
       } else if (!this.quizEnded) {
@@ -227,8 +241,7 @@ export default {
           this.restartQuiz();
         } else {
           await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
-          const messageRestart = { ...this.messageRestart };
-          await this.pushMessage(messageRestart.content, true);
+          await this.sendRestartMessage();
         }
       }
       this.eraseMessageText();
@@ -236,8 +249,7 @@ export default {
     async sendName() {
       this.username = this.messageText;
       await this.pushMessage(`Nice to meet you ${this.username}!`, true);
-      const messageStart = { ...this.messageStart };
-      await this.pushMessage(messageStart.content, true);
+      await this.sendStartMessage();
     },
     async pushMessage(content, bot, options = []) {
       if (bot) {
@@ -245,7 +257,8 @@ export default {
       }
       const lastMessage = this.messages[this.messages.length - 1];
       const dateNow = new Date();
-      const dateFormatted = `${dateNow.getHours()}:${dateNow.getMinutes()}`;
+      const dateFormatted =
+        `${dateNow.getHours() < 10 ? '0' : ''}${dateNow.getHours()}:${dateNow.getMinutes() < 10 ? '0' : ''}${dateNow.getMinutes()}`;
       const messageWithId = { 
         id: (lastMessage) ? lastMessage.id + 1 : 0,
         sender: bot ? 'Bot' : this.username,
@@ -267,7 +280,9 @@ export default {
         // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
       }
     },
+    handleResize() {
+      this.window.width = window.innerWidth;
+      this.window.height = window.innerHeight;
+    }
   }
 }
-
-

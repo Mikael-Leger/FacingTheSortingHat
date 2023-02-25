@@ -1,7 +1,7 @@
 
 <section class="chatbox">
   <Transition name="chat-box">
-    <div v-if="showBox" class="box">
+    <div v-if="showBox" class="box" :class="window.width >= 850 ? window.width >= 1300 ? 'lg' : 'md' : 'sm'">
       <v-card
         class="box-card"
         variant="tonal">
@@ -10,9 +10,18 @@
             <div>
               FTSH Bot
             </div>
-            <svg-icon type="mdi" :path="pathCloseIcon"></svg-icon>
+            <svg-icon type="mdi" :path="pathCloseIcon" class="img-close-icon"></svg-icon>
           </button>
         </v-card-title>
+        <v-progress-linear
+          v-model="progression"
+          color="#3177bd"
+          height="25"
+        >
+          <template v-slot:default="{ progression }">
+            <strong>{{ questionIndex > 0 ? `${Math.round((questionIndex * 100) / questions.length)}%` : '' }}</strong>
+          </template>
+        </v-progress-linear>
         <v-card-text class="box-text">
           <div class="box-chat">
             <perfect-scrollbar class="perfect-scrollbar">
@@ -52,7 +61,8 @@
               <v-text-field
                 label="Write your message here"
                 hide-details="auto"
-                v-model="messageText">
+                v-model="messageText"
+                class="message-text">
                 <template v-slot:append>
                   <v-btn type="submit" class="button-send-message">
                     <svg-icon type="mdi" :path="pathSendIcon"></svg-icon>
@@ -65,7 +75,7 @@
       </v-card>
     </div>
   </Transition>
-  <div v-if="showClosedBox" class="box box-closed">
+  <div v-if="showClosedBox" class="box box-closed" :class="window.width >= 850 ? window.width >= 1300 ? 'lg' : 'md' : 'sm'">
     <v-card
       class="box-card"
       variant="tonal">
