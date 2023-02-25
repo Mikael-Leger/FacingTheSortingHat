@@ -71,6 +71,9 @@ export default {
     this.pushMessage('Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)', true);
     this.showBox = !this.showBox;
     this.showClosedBox = !this.showClosedBox;
+    // this.startQuiz();
+    // this.startQuiz();
+    // this.startQuiz();
   },
   methods: {
     async sendAnswerWithCallback(title, eraseAnswers, callback) {
@@ -170,6 +173,9 @@ export default {
       this.startQuiz();
     },
     async closeChatbox() {
+      if (this.window.width < 850) {
+        return;
+      }
       this.messagesSaved = [ ...this.messages ];
       await Promise.resolve(this.messages = []);
       this.showBox = !this.showBox;
@@ -272,11 +278,14 @@ export default {
       this.scrollToBottom();
     },
     async scrollToBottom() {
+      console.log("scroll");
+      console.log(this.$refs);
       if (isProxy(this.$refs)) {
+        console.log("is proxy");
         const refs = toRaw(this.$refs)
-        await new Promise(r => setTimeout(r, 1810));
-        // Scrolling make top bar padding go crazy =)
-        // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
+        console.log(refs);
+        await new Promise(r => setTimeout(r, 1510));
+        refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
         // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
       }
     },
