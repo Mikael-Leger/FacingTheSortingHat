@@ -278,15 +278,12 @@ export default {
       this.scrollToBottom();
     },
     async scrollToBottom() {
-      console.log("scroll");
-      console.log(this.$refs);
       if (isProxy(this.$refs)) {
-        console.log("is proxy");
         const refs = toRaw(this.$refs)
-        console.log(refs);
         await new Promise(r => setTimeout(r, 1510));
-        refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView(true);
-        // refs[`bottom${Object.keys(refs).length - 1}`][0].scrollIntoView({ behavior: "smooth" }); // Smooth working but ultra slow, why?
+        const ref = refs[`bottom${Object.keys(refs).length - 1}`][0];
+        ref.scrollIntoView(true);
+        // ref.scrollIntoView({ behavior: "smooth" }); // Smooth not working because of weird perfect scroll element
       }
     },
     handleResize() {

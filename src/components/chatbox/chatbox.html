@@ -79,17 +79,29 @@
     </div>
   </Transition>
   <div v-if="showClosedBox" class="box box-closed" :class="window.width >= 850 ? window.width >= 1300 ? 'lg' : 'md' : 'sm'">
-    <v-card
-      class="box-card"
-      variant="tonal">
-      <v-card-title class="box-title">
+    <div class="box-top">
+      <div class="box-title">
         <button v-on:click="openChatbox()" class="button-close-box">
           <div>
             FTSH Bot
           </div>
-          <svg-icon type="mdi" :path="pathOpenIcon"></svg-icon>
+          <svg-icon type="mdi" :path="pathCloseIcon" class="img-close-icon"></svg-icon>
         </button>
-      </v-card-title>
+      </div>
+      <div class="box-progression">
+        <v-progress-linear
+          v-model="progression"
+          color="#3177bd"
+          height="25">
+          <template v-slot:default="{ progression }">
+            <strong>{{ questionIndex > 0 ? `${Math.round((questionIndex * 100) / questions.length)}%` : '' }}</strong>
+          </template>
+        </v-progress-linear>
+      </div>
+    </div>
+    <v-card
+      class="box-card"
+      variant="tonal">
     </v-card>
   </div>
 </section>
