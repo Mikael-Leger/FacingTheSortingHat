@@ -12,7 +12,7 @@
         </div>
       </v-card-title>
       <div class="box-progression">
-        <v-progress-linear v-model="progression" color="#3177bd" height="25">
+        <v-progress-linear v-model="progression" color="#e0e0e0" height="25">
           <template v-slot:default="{ progression }">
             <strong>{{ questionIndex > 0 ? `${Math.round((questionIndex * 100) / questions.length)}%` : '' }}</strong>
           </template>

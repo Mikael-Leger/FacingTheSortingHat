@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import questionsJson from '../../questions/sorting_hat.json';
+import questionsJson from '../../questions/sorting_hat_full.json';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiWindowRestore, mdiWindowMinimize, mdiSend } from '@mdi/js'
 import { MqResponsive } from "vue3-mq";
@@ -64,9 +64,6 @@ export default {
   mounted () {
     this.pushMessage('Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)', true);
     this.showBox = !this.showBox;
-    // this.startQuiz();
-    // this.startQuiz();
-    // this.startQuiz();
   },
   methods: {
     async sendAnswerWithCallback(title, eraseAnswers, callback) {
