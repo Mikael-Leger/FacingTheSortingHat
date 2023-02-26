@@ -161,7 +161,9 @@ export default {
       this.startQuiz();
     },
     async closeChatbox() {
-      this.showBox = !this.showBox;
+      if(!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        this.showBox = !this.showBox;
+      }
     },
     async openChatbox() {
       this.showBox = !this.showBox;
