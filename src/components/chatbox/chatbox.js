@@ -153,7 +153,8 @@ export default {
         default:
           break;
       }
-      await this.pushMessage(`${houseName}! I have chosen wisely!`, true);
+      await this.pushMessage('Then... It will be....', true);
+      await this.pushMessage(`${houseName}!`, true);
       await this.sendRestartMessage();
     },
     restartQuiz() {
@@ -197,7 +198,7 @@ export default {
       if (!this.quizStarted && this.questionIndex === 0) {
         if (this.username === 'You') {
           this.sendAnswerWithCallback(message, true);
-          this.sendName();
+          this.sendName(message);
         } else {
           this.sendAnswerWithCallback(message, true);
           if (message.toLowerCase() === 'yes') {
@@ -210,7 +211,7 @@ export default {
           }
         }
       } else if (!this.quizEnded) {
-        const question = questions[this.questionIndex];
+        const question = this.questions[this.questionIndex];
         const { answers } = question;
         const answerFound = answers.find(e => message.toLowerCase().includes(e.title.toLowerCase()));
         if (answerFound) {
@@ -231,15 +232,16 @@ export default {
       }
       this.eraseMessageText();
     },
-    async sendName() {
-      this.username = this.messageText;
+    async sendName(message) {
+      this.username = message;
       await this.pushMessage(`Nice to meet you ${this.username}!`, true);
       await this.sendStartMessage();
     },
     async pushMessage(content, bot, options = []) {
       if (bot) {
-        // Simulate bot thinking
         await new Promise(r => setTimeout(r, 1200));
+      } else {
+        await new Promise(r => setTimeout(r, 200));
       }
       const lastMessage = this.messages[this.messages.length - 1];
       const messageWithId = { 
@@ -257,7 +259,7 @@ export default {
   watch: {
     messages: {
       handler(messages) {
-        messages.length > 0 && this.messageWrapper.lastElementChild.scrollIntoView({ behavior: "smooth" })
+        messages.length > 0 && this.messageWrapper.lastElementChild.scrollIntoView({ behavior: "smooth" });
       },
       flush: "post"
     }
