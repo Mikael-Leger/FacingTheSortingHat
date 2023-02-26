@@ -1,0 +1,60 @@
+<section class="chatbox">
+  <div class="box" :class="showBox && 'shown'">
+    <v-card class="box-card" variant="tonal">
+      <v-card-title class="box-title">
+        <div class="">
+          <button v-on:click="closeChatbox()" class="button-close-box">
+            <h3>
+              FTSH Bot
+            </h3>
+            <svg-icon type="mdi" :path="showBox ? pathOpenIcon : pathCloseIcon" class="img-close-icon"></svg-icon>
+          </button>
+        </div>
+      </v-card-title>
+      <div class="box-progression">
+        <v-progress-linear v-model="progression" color="#e0e0e0" height="25">
+          <template v-slot:default="{ progression }">
+            <strong>{{ questionIndex > 0 ? `${Math.round((questionIndex * 100) / questions.length)}%` : '' }}</strong>
+          </template>
+        </v-progress-linear>
+      </div>
+      <v-card-text class="box-text">
+        <ul class="box-chat" ref="messageWrapper">
+          <TransitionGroup name="message-fade">
+            <li v-for="message in messages" :key="message" class="message"
+              :class="message.sender === 'Bot' ? 'message-bot' : 'message-user'">
+              <div class="message-infos">
+                <div class="message-sender">
+                  {{ message.sender }}
+                </div>
+                <div class="message-date">
+                  {{ dateTimeFormatter.format(message.date) }}
+                </div>
+              </div>
+              <div class="message-content">
+                {{ message.content }}
+              </div>
+              <div class="message-answers" :class="message.answersAreLong ? 'message-long' : 'message-short'">
+                <button v-on:click="submitAnswer(answer)" class="message-answer" v-for="answer in message.answers">
+                  {{ answer.title }}
+                </button>
+              </div>
+            </li>
+          </TransitionGroup>
+        </ul>
+        <div class="message-text-bar">
+          <v-form validate-on="submit" @submit.prevent="sendMessage" class="mt-2">
+            <v-text-field label="Write your message here" hide-details="auto" v-model="messageText"
+              class="message-text">
+              <template v-slot:append>
+                <v-btn type="submit" class="button-send-message" :disabled="!(messageText?.trim().length > 0)">
+                  <svg-icon type="mdi" :path="pathSendIcon"></svg-icon>
+                </v-btn>
+              </template>
+            </v-text-field>
+          </v-form>
+        </div>
+      </v-card-text>
+    </v-card>
+  </div>
+</section>

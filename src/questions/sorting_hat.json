@@ -1,0 +1,84 @@
+[
+    {
+        "title": "A troll has gone beserk in the Headmaster's study at Hogwarts.  It is about to smash, crush and tear several irreplaceable items and treasures. In which order would you rescue these objects from the troll's club, if you could?",
+        "answers": [
+            {
+                "title": "First, a nearly perfected cure for dragon pox. Then student records going back 1000 years. Finally, a mysterious handwritten book full of strange runes.",
+                "scores": {
+                    "g": 100,
+                    "r": 0,
+                    "h": 100,
+                    "s": 0
+                }
+            },
+            {
+                "title": "First, student records going back 1000 years. Then a mysterious handwritten book full of strange runes. Finally, a nearly perfected cure for dragon pox.",
+                "scores": {
+                    "g": 0,
+                    "r": 0,
+                    "h": 0,
+                    "s": 100
+                }
+            },
+            {
+                "title": "First, a mysterious handwritten book full of strange runes. Then a nearly perfected cure for dragon pox. Finally, student records going back 1000 years.",
+                "scores": {
+                    "g": 0,
+                    "r": 100,
+                    "h": 0,
+                    "s": 0
+                }
+            },
+            {
+                "title": "First, a nearly perfected cure for dragon pox. Then a mysterious handwritten book full of strange runes. Finally, student records going back 1000 years.",
+                "scores": {
+                    "g": 100,
+                    "r": 0,
+                    "h": 0,
+                    "s": 0
+                }
+            },
+            {
+                "title": "First student records going back 1000 years. Then, a nearly perfected cure for dragon pox. Finally, a mysterious handwritten book full of strange runes.",
+                "scores": {
+                    "g": 0,
+                    "r": 0,
+                    "h": 100,
+                    "s": 0
+                }
+            },
+            {
+                "title": "First,  a mysterious handwritten book full of strange runes. Then student records going back 1000 years. Finally, a nearly perfected cure for dragon pox.",
+                "scores": {
+                    "g": 0,
+                    "r": 100,
+                    "h": 0,
+                    "s": 100
+                }
+            }
+        ]
+    },
+    {
+        "title": "Dawn or dusk?",
+        "answers": [
+            {
+                "title": "Dawn",
+                "scores": {
+                    "g": 100,
+                    "r": 100,
+                    "h": 0,
+                    "s": 0
+                }
+            },
+            {
+                "title": "Dusk",
+                "scores": {
+                    "g": 0,
+                    "r": 0,
+                    "h": 100,
+                    "s": 100
+                }
+            }
+        ]
+    }
+]

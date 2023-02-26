@@ -1,13 +1,13 @@
 # FacingTheSortingHat
 
 ### Clone
-git clone https://github.com/Mikael-Leger/FacingTheSortingHat.git
+```git clone https://github.com/Mikael-Leger/FacingTheSortingHat.git```
 
 ### Install
-npm i
+```npm i```
 
 ### Run
-npm run dev
+```npm run dev```
 
 ### Execute
 http://localhost:3000/
