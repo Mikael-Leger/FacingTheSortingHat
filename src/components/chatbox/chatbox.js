@@ -1,5 +1,5 @@
 import { isProxy, toRaw, ref } from 'vue';
-import questionsJson from '../../questions/sorting_hat_full.json';
+import questionsJson from '../../questions/sorting_hat.json';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiWindowRestore, mdiWindowMinimize, mdiSend } from '@mdi/js'
 import { MqResponsive } from "vue3-mq";
@@ -11,21 +11,16 @@ export default {
     MqResponsive
   },
   setup() {
-    const showBox = ref(false);
-    const showClosedBox = ref(true);
-    const messages = ref([]);
-    const messagesSaved = ref([]);
-    const window = ref({
-      width: 0,
-      height: 0
-    });
+    const messageWrapper = ref(null);
 
-    return { showBox, showClosedBox, messages, messagesSaved, window };
+    return { messageWrapper };
   },
   props: [],
   data () {
     return {
+      showBox: false,
       messageText: null,
+      dateTimeFormatter: new Intl.DateTimeFormat("default", { hour: "numeric", minute: "numeric" }),
       username: 'You',
       pathCloseIcon: mdiWindowRestore,
       pathOpenIcon: mdiWindowMinimize,
@@ -34,6 +29,7 @@ export default {
       quizEnded: false,
       questions: questionsJson.sort((a, b) => 0.5 - Math.random()),
       progression: 0,
+      messages: [],
       messageStart: {
         content: 'Are you ready to start?',
         answers: [
@@ -66,11 +62,8 @@ export default {
     }
   },
   mounted () {
-    window.addEventListener('resize', this.handleResize);
-    this.handleResize();
     this.pushMessage('Hi! I am the Sorting Hat. I will show you which house you will be in. Could you tell me your name? :)', true);
     this.showBox = !this.showBox;
-    this.showClosedBox = !this.showClosedBox;
     // this.startQuiz();
     // this.startQuiz();
     // this.startQuiz();
@@ -97,30 +90,26 @@ export default {
       await this.sendStartMessage();
     },
     async sendQuestion() {
-      if (isProxy(this.questions)) {
-        const questions = toRaw(this.questions)
-        const question = questions[this.questionIndex];
-        const options = [
-          {
-            key: 'answers',
-            value: question.answers
-          },
-          {
-            key: 'answersAreLong',
-            value: (question.answers[0].title.length >= 20) || (question.answers.length >= 5)
-          }
-        ]
-        await this.pushMessage(question.title, true, options);
-      }
+      const question = this.questions[this.questionIndex];
+      const options = [
+        {
+          key: 'answers',
+          value: question.answers
+        },
+        {
+          key: 'answersAreLong',
+          value: (question.answers.find(answer => answer.title.length >= 20) !== -1) || (question.answers.length >= 5)
+        }
+      ]
+      await this.pushMessage(question.title, true, options);
     },
     nextQuestion() {
-      if (this.questionIndex !== this.questions.length - 1) {
-        this.questionIndex++;
-        this.progression = Math.round((this.questionIndex * 100) / this.questions.length);
+      if (this.questionIndex++ !== this.questions.length - 1) {
         this.sendQuestion();
       } else {
         this.chooseHouse();
       }
+      this.progression = Math.round((this.questionIndex * 100) / this.questions.length);
     },
     submitAnswer(answer) {
       if (answer.action) {
@@ -170,23 +159,14 @@ export default {
     restartQuiz() {
       this.quizStarted = false;
       this.questionIndex = 0;
+      this.progression = 0;
       this.startQuiz();
     },
     async closeChatbox() {
-      if (this.window.width < 850) {
-        return;
-      }
-      this.messagesSaved = [ ...this.messages ];
-      await Promise.resolve(this.messages = []);
       this.showBox = !this.showBox;
-      await new Promise(r => setTimeout(r, 1510));
-      this.showClosedBox = !this.showClosedBox;
     },
     async openChatbox() {
-      this.showClosedBox = !this.showClosedBox;
-      await Promise.resolve(this.showBox = !this.showBox);
-      this.messages = [ ...this.messagesSaved ];
-      this.messagesSaved = [];
+      this.showBox = !this.showBox;
     },
     eraseMessageText() {
       this.messageText = '';
@@ -212,6 +192,7 @@ export default {
       await this.pushMessage(messageRestart.content, true, options);
     },
     async sendMessage() {
+      console.log(this.questions[this.questionIndex]);
       if (!this.quizStarted && this.questionIndex === 0) {
         if (this.username === 'You') {
           this.sendAnswerWithCallback(this.messageText, true);
@@ -228,18 +209,15 @@ export default {
           }
         }
       } else if (!this.quizEnded) {
-        if (isProxy(this.questions)) {
-          const questions = toRaw(this.questions)
-          const question = questions[this.questionIndex];
-          const { answers } = question;
-          const answerFound = answers.find(e => this.messageText.toLowerCase().includes(e.title.toLowerCase()));
-          if (answerFound) {
-            this.submitAnswer(answerFound);
-          } else {
-            this.sendAnswerWithCallback(this.messageText, false);
-            await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
-            this.sendQuestion();
-          }
+        const question = questions[this.questionIndex];
+        const { answers } = question;
+        const answerFound = answers.find(e => this.messageText.toLowerCase().includes(e.title.toLowerCase()));
+        if (answerFound) {
+          this.submitAnswer(answerFound);
+        } else {
+          this.sendAnswerWithCallback(this.messageText, false);
+          await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
+          this.sendQuestion();
         }
       } else {
         this.sendAnswerWithCallback(this.messageText, true);
@@ -259,42 +237,28 @@ export default {
     },
     async pushMessage(content, bot, options = []) {
       if (bot) {
+        // Simulate bot thinking
         await new Promise(r => setTimeout(r, 1200));
       }
       const lastMessage = this.messages[this.messages.length - 1];
-      const dateNow = new Date();
-      const dateFormatted =
-        `${dateNow.getHours() < 10 ? '0' : ''}${dateNow.getHours()}:${dateNow.getMinutes() < 10 ? '0' : ''}${dateNow.getMinutes()}`;
       const messageWithId = { 
         id: (lastMessage) ? lastMessage.id + 1 : 0,
         sender: bot ? 'Bot' : this.username,
         content,
-        date: dateFormatted,
+        date: new Date(),
       };
       options.forEach(option => {
         messageWithId[option.key] = option.value;
       });
-      await this.messages.push(messageWithId);
-      this.scrollToBottom(bot);
+      this.messages = [...this.messages, messageWithId];
     },
-    async scrollToBottom(bot) {
-      if (isProxy(this.$refs)) {
-        const refs = toRaw(this.$refs)
-        const ref = refs[`bottom${Object.keys(refs).length - 1}`][0];
-        console.log(`scroll to bottom${Object.keys(refs).length - 1}`);
-        console.log(refs);
-        await new Promise(r => setTimeout(r, 10));
-        ref.scrollIntoView(true);
-        if (bot) {
-          await new Promise(r => setTimeout(r, 1000));
-          ref.scrollIntoView(true);
-        }
-        // ref.scrollIntoView({ behavior: "smooth" }); // Smooth not working because of weird perfect scroll element
-      }
-    },
-    handleResize() {
-      this.window.width = window.innerWidth;
-      this.window.height = window.innerHeight;
+  },
+  watch: {
+    messages: {
+      handler(messages) {
+        messages.length > 0 && this.messageWrapper.lastElementChild.scrollIntoView({ behavior: "smooth" })
+      },
+      flush: "post"
     }
-  }
+  },
 }

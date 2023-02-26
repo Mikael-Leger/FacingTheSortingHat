@@ -4,6 +4,7 @@
   align-items: flex-end;
   justify-content: flex-end;
   height: 100%;
+  overflow-y: hidden;
 }
 
 .box {
@@ -16,6 +17,12 @@
               rgba(0, 0, 0, 0.12) 0px 4px 6px,
               rgba(0, 0, 0, 0.17) 0px 12px 13px,
               rgba(0, 0, 0, 0.09) 0px -3px 5px;
+  transition: transform 0.5s ease-in-out;
+  transform: translateY(0);
+}
+
+.box:not(.shown) {
+  transform: translateY(calc(100% - 55px));
 }
 
 .box-closed {
@@ -123,13 +130,12 @@
   text-decoration: underline;
 }
 
-.perfect-scrollbar {
-  height: 480px;
-}
-
 .box-chat {
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   min-height: 90%;
+  list-style: none;
+  height: 480px;
+  overflow-y: auto;
 }
 
 .message-text-bar {
@@ -146,30 +152,11 @@
   left: 0;
 }
 
-.message-fade-enter-from:has(.message-bot) {
-  width: 30%;
-  font-size: 0em;
-  opacity: 0;
+.message-fade-enter-from.message-bot {
+  transform: translateX(-20px);
 }
-.message-fade-enter-to:has(.message-bot) {
-  width: 100%;
-  font-size: 1em;
-  opacity: 1;
-}
-.message-fade-enter-from:has(.message-user) {
-  margin-left: 70%;
-  width: 30%;
-  font-size: 0em;
-  opacity: 0;
-}
-.message-fade-enter-to:has(.message-user) {
-  margin-left: 0;
-  width: 100%;
-  font-size: 1em;
-  opacity: 1;
-}
-.message-fade-enter-active {
-  transition: all 1.5s ease;
+.message-fade-enter-from.message-user {
+  transform: translateX(20px);
 }
 
 .message-fade-enter-from {
@@ -177,38 +164,10 @@
 }
 .message-fade-enter-to {
   opacity: 1;
+  transform: translateX(0);
 }
 .message-fade-enter-active {
-  transition: all 1.5s ease;
-}
-.message-fade-leave-from {
-  opacity: 1;
-}
-.message-fade-leave-to {
-  opacity: 0;
-}
-.message-fade-leave-active {
-  transition: all 1.5s ease;
-}
-
-.chat-box-enter-from {
-  height: 55px;
-}
-.chat-box-enter-to {
-  height: 630px;
-}
-.chat-box-enter-active {
-  transition: all 1.5s ease;
-}
-
-.chat-box-leave-from {
-  height: 630px;
-}
-.chat-box-leave-to {
-  height: 55px;
-}
-.chat-box-leave-active {
-  transition: all 1.5s ease;
+  transition: transform 0.8s cubic-bezier(0, 1.02, 0.31, 1), opacity 0.6s cubic-bezier(0, 1.02, 0.31, 1);
 }
 
 /*************\ 

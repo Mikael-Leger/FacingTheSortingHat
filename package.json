@@ -1,5 +1,5 @@
 {
-  "name": "oooo",
+  "name": "facing-the-sorting-hat",
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,6 @@
     "roboto-fontface": "*",
     "vue": "^3.2.38",
     "vue3-mq": "^3.1.3",
-    "vue3-perfect-scrollbar": "^1.6.1",
     "vuetify": "^3.0.0",
     "webfontloader": "^1.0.0"
   },
