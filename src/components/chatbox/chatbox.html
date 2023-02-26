@@ -1,14 +1,16 @@
 <section class="chatbox">
   <div class="box" :class="showBox && 'shown'">
-    <div class="box-top">
-      <div class="box-title">
-        <button v-on:click="closeChatbox()" class="button-close-box">
-          <h3>
-            FTSH Bot
-          </h3>
-          <svg-icon type="mdi" :path="showBox ? pathCloseIcon : pathOpenIcon" class="img-close-icon"></svg-icon>
-        </button>
-      </div>
+    <v-card class="box-card" variant="tonal">
+      <v-card-title class="box-title">
+        <div class="">
+          <button v-on:click="closeChatbox()" class="button-close-box">
+            <h3>
+              FTSH Bot
+            </h3>
+            <svg-icon type="mdi" :path="showBox ? pathOpenIcon : pathCloseIcon" class="img-close-icon"></svg-icon>
+          </button>
+        </div>
+      </v-card-title>
       <div class="box-progression">
         <v-progress-linear v-model="progression" color="#3177bd" height="25">
           <template v-slot:default="{ progression }">
@@ -16,8 +18,6 @@
           </template>
         </v-progress-linear>
       </div>
-    </div>
-    <v-card class="box-card" variant="tonal">
       <v-card-text class="box-text">
         <ul class="box-chat" ref="messageWrapper">
           <TransitionGroup name="message-fade">
@@ -43,11 +43,11 @@
           </TransitionGroup>
         </ul>
         <div class="message-text-bar">
-          <v-form validate-on="submit" @submit.prevent="sendMessage">
+          <v-form validate-on="submit" @submit.prevent="sendMessage" class="mt-2">
             <v-text-field label="Write your message here" hide-details="auto" v-model="messageText"
               class="message-text">
               <template v-slot:append>
-                <v-btn type="submit" class="button-send-message">
+                <v-btn type="submit" class="button-send-message" :disabled="!(messageText?.trim().length > 0)">
                   <svg-icon type="mdi" :path="pathSendIcon"></svg-icon>
                 </v-btn>
               </template>

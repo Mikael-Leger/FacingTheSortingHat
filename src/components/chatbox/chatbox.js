@@ -1,4 +1,4 @@
-import { isProxy, toRaw, ref } from 'vue';
+import { ref } from 'vue';
 import questionsJson from '../../questions/sorting_hat.json';
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiWindowRestore, mdiWindowMinimize, mdiSend } from '@mdi/js'
@@ -192,16 +192,17 @@ export default {
       await this.pushMessage(messageRestart.content, true, options);
     },
     async sendMessage() {
-      console.log(this.questions[this.questionIndex]);
+      const message = this.messageText.trim();
+      this.eraseMessageText();
       if (!this.quizStarted && this.questionIndex === 0) {
         if (this.username === 'You') {
-          this.sendAnswerWithCallback(this.messageText, true);
+          this.sendAnswerWithCallback(message, true);
           this.sendName();
         } else {
-          this.sendAnswerWithCallback(this.messageText, true);
-          if (this.messageText.toLowerCase() === 'yes') {
+          this.sendAnswerWithCallback(message, true);
+          if (message.toLowerCase() === 'yes') {
             this.startQuiz();
-          } else if (this.messageText.toLowerCase() === 'no') {
+          } else if (message.toLowerCase() === 'no') {
             this.askAgain();
           } else {
             await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
@@ -211,17 +212,17 @@ export default {
       } else if (!this.quizEnded) {
         const question = questions[this.questionIndex];
         const { answers } = question;
-        const answerFound = answers.find(e => this.messageText.toLowerCase().includes(e.title.toLowerCase()));
+        const answerFound = answers.find(e => message.toLowerCase().includes(e.title.toLowerCase()));
         if (answerFound) {
           this.submitAnswer(answerFound);
         } else {
-          this.sendAnswerWithCallback(this.messageText, false);
+          this.sendAnswerWithCallback(message, false);
           await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
           this.sendQuestion();
         }
       } else {
-        this.sendAnswerWithCallback(this.messageText, true);
-        if (this.messageText.toLowerCase() === 'restart') {
+        this.sendAnswerWithCallback(message, true);
+        if (message.toLowerCase() === 'restart') {
           this.restartQuiz();
         } else {
           await this.pushMessage(`Sorry ${this.username}, I did not understand your choice.`, true);
