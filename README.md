@@ -1,8 +1,10 @@
 # FacingTheSortingHat
 
 ## Node version
+<pre>
 node v18.12.1
 npm 9.1.2
+</pre>
 
 ## Installation
 ### Clone
