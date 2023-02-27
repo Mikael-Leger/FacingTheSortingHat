@@ -1,5 +1,9 @@
 # FacingTheSortingHat
 
+## Node version
+node v18.12.1
+npm 9.1.2
+
 ## Installation
 ### Clone
 ```git clone https://github.com/Mikael-Leger/FacingTheSortingHat.git```
