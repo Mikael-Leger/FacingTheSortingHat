@@ -14,6 +14,7 @@ http://localhost:3000/
 
 ## Contribute
 ### Structure
+<pre>
 |__src\
    |__components\
       |__chatbox\
@@ -22,6 +23,7 @@ http://localhost:3000/
          |__chatbox.css\
    |__questions\
       |__sorting_hat_full.json\
+</pre>
 
 ### Functions
 chatbox.js\
